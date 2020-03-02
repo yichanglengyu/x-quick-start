@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -80,16 +81,23 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
     private Specification<T> createSpecification(JSONObject filter) {
         return (Specification<T>) (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicatesList = new ArrayList<>();
-
             for (String key : filter.keySet()) {
                 String[] strs = key.split("\\$");
                 String filed = strs[0];
                 String expression = strs.length > 1 ? strs[1] : "eq";
 
+                // 如果值为字符串，且值为空串，则条件无效
+                Object value = filter.get(key);
+                if (value instanceof String && !StringUtils.isEmpty(value)) {
+                    continue;
+                }
+
                 switch (expression) {
-                    case "like" : predicatesList.add(criteriaBuilder.like(root.get(filed), '%' + (String) filter.get(key) + '%'));
+                    case "like" : {
+                        predicatesList.add(criteriaBuilder.like(root.get(filed), '%' + (String)value + '%'));
                         break;
-                    case "eq" : predicatesList.add(criteriaBuilder.equal(root.get(filed), filter.get(key)));
+                    }
+                    case "eq" : predicatesList.add(criteriaBuilder.equal(root.get(filed), value));
                         break;
 
                     case "in" : {
@@ -102,7 +110,7 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
                         break;
                     }
                     // 默认eq查询eq
-                    default : predicatesList.add(criteriaBuilder.equal(root.get(filed), filter.get(key)));
+                    default : predicatesList.add(criteriaBuilder.equal(root.get(filed), value));
 
                 }
 
