@@ -3,6 +3,7 @@ target/
 # Editor directories and files
 .idea
 .vscode
+*.iml
 *.suo
 *.ntvs*
 *.njsproj

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -86,6 +87,11 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
                 String filed = strs[0];
                 String expression = strs.length > 1 ? strs[1] : "eq";
 
+                Object value = filter.get(key);
+                if (value instanceof String && StringUtils.isEmpty(value)) {
+                    continue;
+                }
+
                 switch (expression) {
                     case "like" : predicatesList.add(criteriaBuilder.like(root.get(filed), '%' + (String) filter.get(key) + '%'));
                         break;
@@ -112,9 +118,9 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
     }
 
     private Pageable createPageable(JSONObject json, Sort sort) {
-        int pageNo = (int) json.getOrDefault("pageNo", 0);
+        int pageNo = (int) json.getOrDefault("pageNo", 0) - 1;
         int pageSize = (int) json.getOrDefault("pageSize", 15);
-        if (pageNo == 0 && pageSize == 0) {
+        if (pageNo == - 1 && pageSize == 0) {
             return null;
         }
         return sort == null ? PageRequest.of(pageNo, pageSize) : PageRequest.of(pageNo, pageSize, sort);
