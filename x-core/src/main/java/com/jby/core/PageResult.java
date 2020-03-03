@@ -1,9 +1,11 @@
 package com.jby.core;
 
+import lombok.Data;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+@Data
 public class PageResult {
 
     // 分页的条件
@@ -25,35 +27,4 @@ public class PageResult {
         this.content = content;
     }
 
-    public Pageable getPageable() {
-        return pageable;
-    }
-
-    public void setPageable(Pageable pageable) {
-        this.pageable = pageable;
-    }
-
-    public Integer getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(Integer totalPages) {
-        this.totalPages = totalPages;
-    }
-
-    public Integer getTotalElements() {
-        return totalElements;
-    }
-
-    public void setTotalElements(Integer totalElements) {
-        this.totalElements = totalElements;
-    }
-
-    public List getContent() {
-        return content;
-    }
-
-    public void setContent(List content) {
-        this.content = content;
-    }
 }

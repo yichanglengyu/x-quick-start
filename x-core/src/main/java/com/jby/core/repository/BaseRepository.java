@@ -88,7 +88,7 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
 
                 // 如果值为字符串，且值为空串，则条件无效
                 Object value = filter.get(key);
-                if (value instanceof String && !StringUtils.isEmpty(value)) {
+                if (value instanceof String && StringUtils.isEmpty(value)) {
                     continue;
                 }
 
@@ -120,9 +120,9 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
     }
 
     private Pageable createPageable(JSONObject json, Sort sort) {
-        int pageNo = (int) json.getOrDefault("pageNo", 0);
+        int pageNo = (int) json.getOrDefault("pageNo", 0) - 1;
         int pageSize = (int) json.getOrDefault("pageSize", 15);
-        if (pageNo == 0 && pageSize == 0) {
+        if (pageNo == -1 && pageSize == 0) {
             return null;
         }
         return sort == null ? PageRequest.of(pageNo, pageSize) : PageRequest.of(pageNo, pageSize, sort);
