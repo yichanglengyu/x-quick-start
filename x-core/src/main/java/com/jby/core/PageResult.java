@@ -17,14 +17,14 @@ public class PageResult {
     // 查询数据总数
     private Integer totalElements;
 
-    private List content;
+    private List rows;
 
 
-    public PageResult(Pageable pageable, Integer totalPages, Integer totalElements, List content) {
+    public PageResult(Pageable pageable, Integer totalPages, Integer totalElements, List rows) {
         this.pageable = pageable;
         this.totalPages = totalPages;
         this.totalElements = totalElements;
-        this.content = content;
+        this.rows = rows;
     }
 
 }
