@@ -34,6 +34,7 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
 
     @Override
     public PageResult list(JSONObject json) {
+        System.out.println("查询json = " + json.toJSONString());
         Sort sort = createSort(json.getJSONObject("sort"));
         Pageable pageable = createPageable(json, sort);
 
@@ -122,7 +123,7 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
     private Pageable createPageable(JSONObject json, Sort sort) {
         int pageNo = (int) json.getOrDefault("pageNo", 0) - 1;
         int pageSize = (int) json.getOrDefault("pageSize", 15);
-        if (pageNo == -1 && pageSize == 0) {
+        if (pageNo == -1) {
             return null;
         }
         return sort == null ? PageRequest.of(pageNo, pageSize) : PageRequest.of(pageNo, pageSize, sort);
