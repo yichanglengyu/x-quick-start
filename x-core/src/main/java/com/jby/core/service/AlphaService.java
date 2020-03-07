@@ -5,12 +5,14 @@ package com.jby.core.service;
 import com.alibaba.fastjson.JSONObject;
 import com.jby.core.PageResult;
 import com.jby.core.repository.IBaseRepository;
+import com.jby.core.utils.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.List;
 
 @Transactional(readOnly = true)
@@ -23,7 +25,7 @@ public abstract class AlphaService<T, ID extends Serializable> {
      * @return repository
      * @throws Exception
      */
-    protected IBaseRepository<T, ID> repository() throws Exception {
+    private IBaseRepository<T, ID> repository() throws Exception {
         if (repository != null) {
             return repository;
         }
@@ -91,6 +93,14 @@ public abstract class AlphaService<T, ID extends Serializable> {
 
     @Transactional
     public T save(T bean) throws Exception {
+
+        // 反射设置创建时间和更新时间
+        Object id = BeanUtils.getProperty(bean, "id");
+        if (id == null) {
+            BeanUtils.setProperty(bean, "createTime", new Date());
+        }
+        BeanUtils.setProperty(bean, "updateTime", new Date());
+
         return repository().save(bean);
     }
 
