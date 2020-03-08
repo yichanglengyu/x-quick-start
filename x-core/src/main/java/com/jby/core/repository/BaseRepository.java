@@ -3,6 +3,8 @@ package com.jby.core.repository;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jby.core.PageResult;
+import com.jby.core.data.SortBuilder;
+import com.jby.core.utils.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +37,8 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
     @Override
     public PageResult list(JSONObject json) {
         System.out.println("查询json = " + json.toJSONString());
-        Sort sort = createSort(json.getJSONObject("sort"));
+        Sort sort = SortBuilder.create(json.getJSONObject("sort")).getSort();
+
         Pageable pageable = createPageable(json, sort);
 
         JSONObject filter = (JSONObject)json.getOrDefault("filter", new JSONObject());
@@ -56,14 +59,8 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
 
     @Override
     public T getByProperty(Object[] props) {
-        JSONObject json = new JSONObject();
-        for(int i = 0; i < props.length / 2; i++){
-            String propName = props[i * 2].toString();
-            Object propValue = props[i * 2 + 1];
-            json.put(propName, propValue);
-        }
-        Specification<T> specification = createSpecification(json);
-        return findOne(specification).orElse(null);
+        List<T> list = this.getAllByProperty(props);
+        return list.size() > 0 ? list.get(0) : null;
     }
 
     @Override
@@ -75,8 +72,13 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
             json.put(propName, propValue);
         }
 
+        Sort sort = Sort.unsorted();
+        if (props.length % 2 > 0) { // 有排序字段
+            sort = (Sort) props[props.length -1];
+        }
+
         Specification<T> specification = createSpecification(json);
-        return findAll(specification);
+        return findAll(specification, sort);
     }
 
     private Specification<T> createSpecification(JSONObject filter) {
@@ -120,7 +122,9 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
         };
     }
 
+
     private Pageable createPageable(JSONObject json, Sort sort) {
+        // jpa查询中， pageNo = 0 为首页，为了方便理解，使用时1为首页，所以这里做特殊处理
         int pageNo = (int) json.getOrDefault("pageNo", 0) - 1;
         int pageSize = (int) json.getOrDefault("pageSize", 15);
         if (pageNo == -1) {
@@ -129,58 +133,12 @@ public class BaseRepository<T, ID extends Serializable> extends SimpleJpaReposit
         return sort == null ? PageRequest.of(pageNo, pageSize) : PageRequest.of(pageNo, pageSize, sort);
     }
 
-    private Sort createSort(JSONObject json) {
-        if (json == null || json.isEmpty()) {
-            return Sort.unsorted();
-        }
-        List<Sort.Order> orders = new ArrayList<>();
-        for (String key : json.keySet()) {
-            orders.add(new Sort.Order(Sort.Direction.fromString((String)json.getOrDefault(key, "asc")), key));
-        }
-        Sort sort = Sort.by(orders);
-        return sort;
-    }
-
-
-    /**
-     * !!!!!!!!!!!!未完成
-     * 反射设置bean的属性值
-     * @param bean
-     * @param name
-     * @param value
-     * @return
-     * @throws Exception
-     */
-    private boolean setBeanProperty(Object bean, String name, Object value) throws Exception{
-
-        System.out.println(bean.getClass().getSimpleName() + "." + name + ":");
-        for(Field field : bean.getClass().getDeclaredFields()){
-            String fieldName = field.getName();
-            System.out.println(fieldName + ",");
-            if(fieldName.equals(name)){
-                field.setAccessible(true);
-                field.set(bean, value);
-                return true;//表示匹配到了
-            }
-        }
-        return false;//表示没有匹配到这个字段
-
-
-       /* Field field = bean.getClass().getDeclaredField(fieldName.hashCode());
-        if (field != null) {
-            field.setAccessible(true);
-            field.set(bean, value);
-            return true;//表示匹配到了
-        }
-        return false;*/
-    }
-
     @Override
     public void deleteLogic(ID id) throws Exception {
         T bean = getOne(id);
         if(bean != null) {
 
-            setBeanProperty(bean, "status", -1);
+            BeanUtils.setProperty(bean, "status", -1);
             save(bean);
         }
     }
