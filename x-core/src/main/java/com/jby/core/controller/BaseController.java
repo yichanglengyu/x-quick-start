@@ -3,6 +3,7 @@ package com.jby.core.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jby.core.exception.BusinessLogicException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,5 +19,15 @@ public class BaseController {
         String jsonStr = request.getParameter(key);
         return (JSONArray)JSON.parse(jsonStr);
     }
+
+
+    protected static void breaks(String message) throws BusinessLogicException {
+        throw new BusinessLogicException(0, message);
+    }
+
+    protected static void breaks(Integer code, String message ) throws BusinessLogicException {
+        throw new BusinessLogicException(code, message);
+    }
+
 
 }

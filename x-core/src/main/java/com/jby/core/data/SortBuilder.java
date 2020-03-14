@@ -7,6 +7,12 @@ import org.springframework.data.domain.Sort;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * spring jpa 的排序构造器
+ * spring jpa 的sort构造太繁琐，所以封装了这个构造器
+ * 使用方式：
+ * SortBuilder.create().asc("id").desc("age").getSort();  // 根据id升序，age降序
+ */
 @Data
 public class SortBuilder {
 

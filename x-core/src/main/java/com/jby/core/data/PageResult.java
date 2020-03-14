@@ -1,4 +1,4 @@
-package com.jby.core;
+package com.jby.core.data;
 
 import lombok.Data;
 import org.springframework.data.domain.Pageable;

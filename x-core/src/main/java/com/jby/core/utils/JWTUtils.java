@@ -19,13 +19,11 @@ public class JWTUtils {
      */
     private static final byte[] SECRET = "6MNSobBRCHGIO0fS6MNSobBRCHGIO0fS".getBytes();
 
-    /**
-     * 过期时间
-     */
-    private static final long EXPIRE_TIME = 1000 * 60 * 60;
-
-
     public static String getToken(JSONObject content) {
+        return JWTUtils.getToken(content, (long) (1000 * 60 * 60));
+    }
+
+    public static String getToken(JSONObject content, Long expireTime) {
         try {
             /**
              * 1.创建一个32-byte的密匙
@@ -35,7 +33,7 @@ public class JWTUtils {
              * 2. 建立payload 载体
              */
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                    .expirationTime(new Date(System.currentTimeMillis() + EXPIRE_TIME))
+                    .expirationTime(new Date(System.currentTimeMillis() + expireTime))
                     .claim("content", content.toString())
                     .build();
 

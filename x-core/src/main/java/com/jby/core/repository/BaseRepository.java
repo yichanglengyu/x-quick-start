@@ -2,7 +2,7 @@ package com.jby.core.repository;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.jby.core.PageResult;
+import com.jby.core.data.PageResult;
 import com.jby.core.data.SortBuilder;
 import com.jby.core.utils.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -17,7 +17,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 

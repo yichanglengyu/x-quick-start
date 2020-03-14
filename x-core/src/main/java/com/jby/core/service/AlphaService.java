@@ -3,7 +3,8 @@ package com.jby.core.service;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.jby.core.PageResult;
+import com.jby.core.data.PageResult;
+import com.jby.core.exception.BusinessLogicException;
 import com.jby.core.repository.IBaseRepository;
 import com.jby.core.utils.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,4 +133,11 @@ public abstract class AlphaService<T, ID extends Serializable> {
         repository().deleteLogic(id);
     }
 
+    protected static void breaks(String message) throws BusinessLogicException {
+        throw new BusinessLogicException(0, message);
+    }
+
+    protected static void breaks(Integer code, String message ) throws BusinessLogicException {
+        throw new BusinessLogicException(code, message);
+    }
 }

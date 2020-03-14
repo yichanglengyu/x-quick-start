@@ -1,7 +1,7 @@
 package com.jby.core.repository;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jby.core.PageResult;
+import com.jby.core.data.PageResult;
 import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
 import org.springframework.data.repository.NoRepositoryBean;
 
